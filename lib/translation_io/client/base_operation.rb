@@ -4,6 +4,7 @@ require 'translation_io/client/base_operation/create_new_mo_files_step'
 require 'translation_io/client/base_operation/save_new_yaml_files_step'
 require 'translation_io/client/base_operation/save_special_yaml_files_step'
 require 'translation_io/client/base_operation/dump_markup_gettext_keys_step'
+require 'translation_io/client/base_operation/dump_db_text_keys_step'
 
 module TranslationIO
   class Client
