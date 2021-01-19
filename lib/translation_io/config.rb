@@ -42,6 +42,8 @@ module TranslationIO
     attr_accessor :pot_copyright_holder
     attr_accessor :pot_copyright_year
 
+    attr_accessor :db_fields
+
     def initialize
 
       #######
