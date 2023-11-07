@@ -29,7 +29,6 @@ module TranslationIO
         # multi-line strings
         def escape_entry(entry)          
           entry.gsub('"', '\"')
-               .gsub("\r\n", '\r\n')
                .gsub("\n", '\n')
         end
 
