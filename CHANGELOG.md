@@ -1,4 +1,121 @@
-#  Changelog
+# Changelog
+
+## [v1.40](https://github.com/translation/rails/releases/tag/v1.40) (2024-02-09)
+
+#### Fixes (bugs & defects):
+
+ * Fix *more* bugs when YAML file is commented and the language key is still present.
+
+## [v1.39](https://github.com/translation/rails/releases/tag/v1.39) (2024-02-09)
+
+#### Fixes (bugs & defects):
+
+ * Fix bug when YAML file is commented and the language key is still present.
+
+## [v1.38](https://github.com/translation/rails/releases/tag/v1.38) (2023-10-23)
+
+#### Fixes (bugs & defects):
+
+ * Bump GetText dependency to 3.4.9 (fix `\r` escape and other improvements)
+ 
+## [v1.37](https://github.com/translation/rails/releases/tag/v1.37) (2023-06-27)
+
+#### Fixes (bugs & defects):
+
+ * Prepare compatibility with Ruby 3.3 by bumping GetText dependency
+ 
+## [v1.36](https://github.com/translation/rails/releases/tag/v1.36) (2023-05-03)
+
+#### Fixes (bugs & defects):
+
+ * Keep YAML files and keys from locales that are not in the configuration file (#54)
+
+## [v1.35](https://github.com/translation/rails/releases/tag/v1.35) (2023-01-12)
+
+#### Fixes (bugs & defects):
+
+ * Compatibility with Ruby 3.2 (Fix `File.exists?` to `File.exist?`)
+
+## [v1.34](https://github.com/translation/rails/releases/tag/v1.34) (2022-11-16)
+
+#### Fixes (bugs & defects):
+
+ * Fix plural rule in source PO file by manually adding it (for GetText >= 3.3.9)
+
+## [v1.33](https://github.com/translation/rails/releases/tag/v1.33) (2022-11-07)
+
+#### New features:
+
+ * Match I18n fallbacks in GetText (cf. [#48](https://github.com/translation/rails/issues/48) and [#50](https://github.com/translation/rails/pull/50)). Thanks @ryanb!
+ 
+**Important information:** a new directory with PO/MO files for the source language will be created in your `locales/gettext` directory. 
+Don't worry, it's expected: the purpose is to unify fallback management.
+
+## [v1.32](https://github.com/translation/rails/releases/tag/v1.32) (2022-05-20)
+
+#### Fixes (bugs & defects):
+
+ * Fix bad `html.erb` parsing when there is a `case` in it, using new gettext 3.4.3 Erubi parser. (cf. [ruby-gettext/gettext PR #91](https://github.com/ruby-gettext/gettext/pull/91)).
+
+## [v1.31](https://github.com/translation/rails/releases/tag/v1.31) (2022-04-04)
+
+#### Fixes (bugs & defects):
+
+ * Fix Psych 4 breaking change when loading YAML files with aliases. See [issue #47](https://github.com/translation/rails/issues/47).
+
+## [v1.30](https://github.com/translation/rails/releases/tag/v1.30) (2022-03-23)
+
+#### New features:
+
+ * Don't raise an issue for a conflicted `.translation_io` file anymore, but fix it directly.
+
+## [v1.29](https://github.com/translation/rails/releases/tag/v1.29) (2022-02-01)
+
+#### Fixes (bugs & defects):
+
+ * Use `source_locale` as last fallback for GetText (instead of default "en").
+
+## [v1.28](https://github.com/translation/rails/releases/tag/v1.28) (2022-01-17)
+
+#### New features:
+
+ * Bump GetText dependency to 3.4.2 to support:
+   * Automatic locale fallbacks `fr_BE_Foo` -> `fr_BE` -> `fr` (cf. [ruby-gettext/gettext#89](https://github.com/ruby-gettext/gettext/issues/89))
+   * Ruby 3.1 (cf. [ruby-gettext/gettext#92](https://github.com/ruby-gettext/gettext/issues/92))
+
+## [v1.27](https://github.com/translation/rails/releases/tag/v1.27) (2021-10-06)
+
+#### Fixes (bugs & defects):
+
+ * Improve symbol/string consistency of `source_locale` and `target_locales`.
+
+## [v1.26](https://github.com/translation/rails/releases/tag/v1.26) (2021-07-14)
+
+#### Fixes (bugs & defects):
+
+ * Fix syntax issue with Ruby 3.0 and release v1.25 (that is now yanked!)
+
+## [v1.25](https://github.com/translation/rails/releases/tag/v1.25) (2021-07-14)
+
+#### Fixes (bugs & defects):
+
+ * Don't remove empty keys in `localization.xx.yml` files when `config.yaml_remove_empty_keys = true`, they may be useful for delimiters, etc.
+
+## [v1.24](https://github.com/translation/rails/releases/tag/v1.24) (2021-06-15)
+
+#### Fixes (bugs & defects):
+
+ * Force max version of GetText (3.3.7) to avoid dependency to external online request (see [here](https://github.com/ruby-gettext/gettext/issues/85#issuecomment-861462382) for discussion).
+
+#### New features:
+
+ * Warnings when trying to init/sync with duplicate or empty `target_locales` in the configuration file.
+
+## [v1.23](https://github.com/translation/rails/releases/tag/v1.23) (2021-01-17)
+
+#### Fixes (bugs & defects):
+
+ * Fix `ArgumentError: comparison of Pathname with String failed` if `I18n.load_path` contains a Pathname instead of a String ([#41](https://github.com/translation/rails/issues/41)). Thanks @11mdlow!
 
 ## [v1.22](https://github.com/translation/rails/releases/tag/v1.22) (2020-07-27)
 

@@ -21,7 +21,7 @@ module TranslationIO
 
             reload_or_reuse_yaml_sources
 
-            @yaml_sources.each do |yaml_source|
+            @yaml_sources.to_a.each do |yaml_source|
               yaml_file_path = yaml_source[:yaml_file_path]
               yaml_flat_hash = yaml_source[:yaml_flat_hash]
 
@@ -46,7 +46,7 @@ module TranslationIO
           if yaml_sources_reload_needed?
             @yaml_sources = sort_by_project_locales_first(@yaml_file_paths).collect do |yaml_file_path|
               yaml_content   = File.read(yaml_file_path)
-              yaml_hash      = YAML::load(yaml_content)
+              yaml_hash      = TranslationIO.yaml_load(yaml_content)
               yaml_flat_hash = FlatHash.to_flat_hash(yaml_hash)
 
               {
@@ -55,7 +55,7 @@ module TranslationIO
               }
             end
           else
-            @yaml_sources
+            @yaml_source
           end
         end
 
@@ -103,7 +103,7 @@ module TranslationIO
           # Source yaml file like config/locales/en.yml
           yaml_file_path = File.expand_path(File.join(TranslationIO.config.yaml_locales_path, "#{@source_locale}.yml"))
 
-          if File.exists?(yaml_file_path)
+          if File.exist?(yaml_file_path)
             # Complete existing hash if YAML file already exists
             existing_yaml_source = @yaml_sources.detect { |y_s| normalize_path(y_s[:yaml_file_path]) == normalize_path(yaml_file_path) }
             yaml_flat_hash       = existing_yaml_source[:yaml_flat_hash]
@@ -133,11 +133,12 @@ module TranslationIO
           if File.exist?(TranslationIO.config.metadata_path)
             metadata_content = File.read(TranslationIO.config.metadata_path)
 
+            # If any conflicts in file, take the lowest timestamp and potentially reapply some source edits
             if metadata_content.include?('>>>>') || metadata_content.include?('<<<<')
-              TranslationIO.info "[Error] #{TranslationIO.config.metadata_path} file is corrupted and seems to have unresolved versioning conflicts. Please resolve them and try again."
-              exit(false)
+              timestamps = metadata_content.scan(/timestamp: (\d*)/).flatten.uniq.collect(&:to_i)
+              return timestamps.min || 0
             else
-              return YAML::load(metadata_content)['timestamp'] rescue 0
+              return YAML.load(metadata_content)['timestamp'] rescue 0
             end
           else
             return 0
@@ -146,6 +147,13 @@ module TranslationIO
 
         def update_metadata_timestamp
           File.open(TranslationIO.config.metadata_path, 'w') do |f|
+            f.puts '# This file is used in the context of Translation.io source editions.'
+            f.puts '# Please see: https://translation.io/blog/new-feature-copywriting'
+            f.puts '#'
+            f.puts '# If you have any git conflicts, either keep the smaller timestamp or'
+            f.puts '# ignore the conflicts and "sync" again, it will fix this file for you.'
+            f.puts
+
             f.write({ 'timestamp' => Time.now.utc.to_i }.to_yaml)
           end
         end
