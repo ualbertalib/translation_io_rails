@@ -35,13 +35,15 @@ module TranslationIO
               YamlEntry.from_locale?(key, target_locale) && !YamlEntry.ignored?(key)
             end
 
-            yaml_data = YAMLConversion.get_yaml_data_from_flat_translations(target_flat_special_translations)
+            yaml_data = YAMLConversion.get_yaml_data_from_flat_translations(target_flat_special_translations, **{
+              :force_keep_empty_keys => true # We want to keep empty keys from localization.xx.yml files (sometimes needed for delimiters!)
+            })
 
             params["yaml_data_#{target_locale}"] = yaml_data
 
             # To have a localization.xx.yml file during tests (without call to backend)
             if TranslationIO.config.test
-              if YAML::load(yaml_data).present?
+              if TranslationIO.yaml_load(yaml_data).present?
                 File.open(yaml_path, 'wb') do |file|
                   file.write(self.class.top_comment)
                   file.write(yaml_data)
@@ -62,7 +64,7 @@ module TranslationIO
                 yaml_path = File.join(@yaml_locales_path, "localization.#{target_locale}.yml")
                 yaml_data = parsed_response["yaml_data_#{target_locale}"]
 
-                if yaml_data.present? && YAML::load(yaml_data).present?
+                if yaml_data.present? && TranslationIO.yaml_load(yaml_data).present?
                   File.open(yaml_path, 'wb') do |file|
                     file.write(self.class.top_comment)
                     file.write(yaml_data)

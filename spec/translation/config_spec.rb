@@ -4,8 +4,8 @@ describe TranslationIO::Config do
   it "stores the configuration options" do
     TranslationIO.configure do |config|
       config.api_key                   = '424242'
-      config.source_locale             = :en
-      config.target_locales            = [:fr, :nl]
+      config.source_locale             = 'en'
+      config.target_locales            = ['fr', 'nl']
       config.endpoint                  = 'http://localhost:3001/api'
       config.ignored_key_prefixes      = ['world.streets']
       config.ignored_source_paths      << 'spec/translation/'
@@ -14,8 +14,8 @@ describe TranslationIO::Config do
     end
 
     TranslationIO.config.api_key.should                   == '424242'
-    TranslationIO.config.source_locale.should             == :en
-    TranslationIO.config.target_locales.should            == [:fr, :nl]
+    TranslationIO.config.source_locale.should             == 'en'
+    TranslationIO.config.target_locales.should            == ['fr', 'nl']
     TranslationIO.config.endpoint.should                  == 'http://localhost:3001/api'
     TranslationIO.config.ignored_key_prefixes.should      == ['world.streets']
     TranslationIO.config.localization_key_prefixes.should == ['date.first_day_of_week_in_english']
@@ -30,7 +30,7 @@ describe TranslationIO::Config do
 
   it '#source_files_for_formats - classic path naming' do
     TranslationIO.configure do |config|
-      config.ignored_source_paths = ['spec/translation/', 'lib/', 'gemfiles/', '.git/']
+      config.ignored_source_paths = ['spec/translation/', 'lib/', 'vendor/', 'gemfiles/', '.git/']
       config.ignored_source_files = ['spec/spec_helper.rb']
     end
 
@@ -42,7 +42,7 @@ describe TranslationIO::Config do
 
   it '#source_files_for_formats - second path naming ("./")' do
     TranslationIO.configure do |config|
-      config.ignored_source_paths = ['./spec/translation/', './lib/', './gemfiles/', './.git/']
+      config.ignored_source_paths = ['./spec/translation/', './lib/', './vendor/', './gemfiles/', './.git/']
       config.ignored_source_files = ['./spec/spec_helper.rb']
     end
 
@@ -54,7 +54,7 @@ describe TranslationIO::Config do
 
   it '#source_files_for_formats - third path naming ("no ending /")' do
     TranslationIO.configure do |config|
-      config.ignored_source_paths = ['spec/translation', 'lib', 'gemfiles', '.git']
+      config.ignored_source_paths = ['spec/translation', 'lib', 'vendor', 'gemfiles', '.git']
       config.ignored_source_files = ['spec/spec_helper.rb']
     end
 
@@ -66,7 +66,7 @@ describe TranslationIO::Config do
 
   it '#source_files_for_formats' do
     TranslationIO.configure do |config|
-      config.ignored_source_paths = ['spec', 'lib', 'gemfiles']
+      config.ignored_source_paths = ['spec', 'lib', 'vendor', 'gemfiles']
 
       config.parsed_gems = []
     end

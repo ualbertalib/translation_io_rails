@@ -13,11 +13,13 @@ module TranslationIO
         haml_source_files = config.haml_source_files
         slim_source_files = config.slim_source_files
         pot_path          = config.pot_path
-        source_locale     = config.source_locale
-        target_locales    = config.target_locales
+        source_locale     = config.source_locale.to_s
+        target_locales    = config.target_locales.map(&:to_s)
         locales_path      = config.locales_path
         yaml_locales_path = config.yaml_locales_path
         yaml_file_paths   = config.yaml_file_paths
+
+        warn_wrong_locales(source_locale, target_locales)
 
         if !config.disable_gettext
           BaseOperation::DumpMarkupGettextKeysStep.new(haml_source_files, :haml).run
@@ -44,7 +46,7 @@ module TranslationIO
 
         if !parsed_response.nil?
           if !config.disable_gettext
-            BaseOperation::SaveNewPoFilesStep.new(target_locales, locales_path, parsed_response).run
+            BaseOperation::SaveNewPoFilesStep.new(source_locale, target_locales, locales_path, parsed_response).run
             BaseOperation::CreateNewMoFilesStep.new(locales_path).run
           end
 

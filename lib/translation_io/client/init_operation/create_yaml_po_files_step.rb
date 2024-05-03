@@ -18,9 +18,9 @@ module TranslationIO
 
           @yaml_file_paths.each do |file_path|
             TranslationIO.info file_path, 2, 2
-            file_translations = YAML::load(File.read(file_path))
+            file_translations = TranslationIO.yaml_load(File.read(file_path))
 
-            unless file_translations.blank?
+            if file_translations.present? && file_translations.values.all? { |value| value.present? }
               all_translations = all_translations.deep_merge(file_translations)
             end
           end
