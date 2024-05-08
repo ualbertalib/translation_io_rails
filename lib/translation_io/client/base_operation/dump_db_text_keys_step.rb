@@ -35,6 +35,10 @@ module TranslationIO
         def extracted_db_entries
           entries = []
           unscoped_item = ["Phase", "Section", "Question"]
+          # @db_fields['CallableQueries'] is either nil or an array of ActiveRecord query procs
+          callable_queries = @db_fields.delete('CallableQueries')
+          # Execute any passed ActiveRecord query procs and add the results to entries array
+          entries.concat(callable_queries.flat_map(&:call)) if callable_queries
           @db_fields.keys.each do |table_name|
             table = table_name.constantize
             @db_fields[table_name].each do |column_name|
