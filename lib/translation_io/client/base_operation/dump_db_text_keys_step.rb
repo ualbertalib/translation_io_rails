@@ -35,6 +35,10 @@ module TranslationIO
         def extracted_db_entries
           entries = []
           unscoped_item = ["Phase", "Section", "Question"]
+          callable_queries = @db_fields.delete('CallableQueries')
+          if callable_queries
+            entries.concat(callable_queries.flat_map(&:call))
+          end
           @db_fields.keys.each do |table_name|
             table = table_name.constantize
             @db_fields[table_name].each do |column_name|
