@@ -21,7 +21,7 @@ module TranslationIO
         locales_path      = config.locales_path
         yaml_locales_path = config.yaml_locales_path
         yaml_file_paths   = config.yaml_file_paths
-        db_fields         = config.db_fields
+        db_query_procs    = config.db_query_procs
 
         if !config.disable_yaml
           ApplyYamlSourceEditsStep.new(yaml_file_paths, source_locale).run(params)
@@ -32,8 +32,8 @@ module TranslationIO
           BaseOperation::DumpMarkupGettextKeysStep.new(slim_source_files, :slim).run
         end
 
-        if db_fields
-          BaseOperation::DumpDBTextKeysStep.new(db_fields).run
+        if db_query_procs
+          BaseOperation::DumpDBTextKeysStep.new(db_query_procs).run
         end
 
         UpdatePotFileStep.new(pot_path, source_files + erb_source_files).run(params)
