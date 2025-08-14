@@ -2,12 +2,12 @@ module TranslationIO
   class Client
     class BaseOperation
       class DumpDBTextKeysStep
-        def initialize(db_fields)
-          @db_fields         = db_fields
+        def initialize(db_query_procs)
+          @db_query_procs = db_query_procs
         end
 
         def run
-          if @db_fields
+          if @db_query_procs
             TranslationIO.info "Extracting source fields from database."
 
             FileUtils.mkdir_p(File.join('tmp', 'translation'))
@@ -33,16 +33,8 @@ module TranslationIO
         end
 
         def extracted_db_entries
-          entries = []
-          unscoped_item = ["Phase", "Section", "Question"]
-          @db_fields.keys.each do |table_name|
-            table = table_name.constantize
-            @db_fields[table_name].each do |column_name|
-              db_strings = if unscoped_item.include? table_name.to_s then table.unscoped.distinct.pluck(column_name) else table.distinct.pluck(column_name) end
-              entries += db_strings
-            end
-          end
-
+          # Execute each proc to fetch DB strings and flatten the results
+          entries = @db_query_procs.flat_map(&:call)
           TranslationIO.info "#{entries.size} entries found in the database", 2, 2
           entries
         end
