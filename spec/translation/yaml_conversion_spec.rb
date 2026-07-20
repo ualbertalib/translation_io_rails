@@ -96,6 +96,7 @@ EOS
       result.should == {
         "en.hello"                  => "Hello world",
         "en.main.menu.stuff"        => "This is stuff",
+        "en.other_main.menu.stuff"  => "This is stuff", # alias in YAML
         "en.bye"                    => "Good bye world",
         "en.empty"                  => nil,
         "en.empty_string"           => "",
@@ -112,6 +113,13 @@ EOS
 
     it 'returns an empty Hash if the YAML file is empty' do
       yaml_path = 'spec/support/data/empty.en.yml'
+      result    = subject.get_flat_translations_for_yaml_file(yaml_path)
+
+      result.should == {}
+    end
+
+    it 'returns an empty Hash if the YAML file is commented (bug fix)' do
+      yaml_path = 'spec/support/data/commented.en.yml'
       result    = subject.get_flat_translations_for_yaml_file(yaml_path)
 
       result.should == {}
@@ -183,6 +191,37 @@ en:
     menu:
       stuff: This is stuff
   bye: Good bye world
+EOS
+      result.should eql(expected_result)
+    end
+
+    it 'does not drops empty keys if special "force_keep_empty_keys" parameter is passed' do
+      TranslationIO.config.yaml_remove_empty_keys = true
+
+      flat_data = {
+        "en.hello"           => "Hello world",
+        "en.main.menu.stuff" => "This is stuff",
+        "en.bye"             => "Good bye world",
+        "en.empty"           => nil,
+        "en.empty_string"    => '',
+        "en.space"           => ' '
+      }
+
+      result = subject.get_yaml_data_from_flat_translations(flat_data, **{
+        :force_keep_empty_keys => true
+      })
+
+      expected_result = <<-EOS
+---
+en:
+  hello: Hello world
+  main:
+    menu:
+      stuff: This is stuff
+  bye: Good bye world
+  empty:
+  empty_string: ''
+  space: " "
 EOS
       result.should eql(expected_result)
     end

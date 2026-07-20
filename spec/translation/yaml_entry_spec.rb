@@ -24,14 +24,16 @@ describe TranslationIO::YamlEntry do
   end
 
   describe '#ignored?' do
-    it do
+    it 'works with default ignored keys' do
       TranslationIO::YamlEntry.ignored?('en.faker.yo'      ).should be true
       TranslationIO::YamlEntry.ignored?('en.faker'         ).should be true
       TranslationIO::YamlEntry.ignored?('en.faker.aa.aa.bb').should be true
       TranslationIO::YamlEntry.ignored?('en.yo'            ).should be false
       TranslationIO::YamlEntry.ignored?('en.fakeryo'       ).should be false
       TranslationIO::YamlEntry.ignored?('fr.faker'         ).should be true
+    end
 
+    it 'works with ignored prefix strings' do
       TranslationIO.config.ignored_key_prefixes = ['world']
 
       TranslationIO::YamlEntry.ignored?('en.world'      ).should be true
@@ -48,6 +50,37 @@ describe TranslationIO::YamlEntry do
 
       # check "." on ignored key prefix is not used as special char in the regexp
       TranslationIO::YamlEntry.ignored?('fr.worlda').should be false
+    end
+
+    it 'works with ignored regular expression' do
+      TranslationIO.config.ignored_key_prefixes = [
+        /\.do_not_translate$/,
+        /^world$|^world\..+$/,
+      ]
+
+      TranslationIO::YamlEntry.ignored?('en.world'                      ).should be true
+      TranslationIO::YamlEntry.ignored?('en.world.hello'                ).should be true
+      TranslationIO::YamlEntry.ignored?('en.worldbla'                   ).should be false
+      TranslationIO::YamlEntry.ignored?('fr.world.hello'                ).should be true
+      TranslationIO::YamlEntry.ignored?('fr.yet.another.world.hello'    ).should be false
+      TranslationIO::YamlEntry.ignored?('fr.mars.hello.do_not_translate').should be true
+    end
+
+    it 'works when using a mix of ignored prefix strings and regular expressions' do
+      TranslationIO.config.ignored_key_prefixes = [
+        /\.do_not_translate$/,
+        /^world$|^world\..+$/,
+        "mars"
+      ]
+
+      TranslationIO::YamlEntry.ignored?('en.world'                      ).should be true
+      TranslationIO::YamlEntry.ignored?('en.world.hello'                ).should be true
+      TranslationIO::YamlEntry.ignored?('en.worldbla'                   ).should be false
+      TranslationIO::YamlEntry.ignored?('fr.world.hello'                ).should be true
+      TranslationIO::YamlEntry.ignored?('fr.yet.another.world.hello'    ).should be false
+      TranslationIO::YamlEntry.ignored?('fr.mars.hello'                 ).should be true
+      TranslationIO::YamlEntry.ignored?('fr.mars.hello.do_not_translate').should be true
+      TranslationIO::YamlEntry.ignored?('fr.mars_attacks.world'         ).should be false
     end
   end
 
@@ -79,14 +112,14 @@ describe TranslationIO::YamlEntry do
 
   describe '#localization_prefix?' do
     it do
-      TranslationIO::YamlEntry.localization_prefix?('en.date.formats.default'  ).should be true
+      TranslationIO::YamlEntry.localization_prefix?('en.date.formats.default').should be true
       TranslationIO::YamlEntry.localization_prefix?('en.date.formatsss.default').should be false
-      TranslationIO::YamlEntry.localization_prefix?('en.date.order[0]'         ).should be true
-      TranslationIO::YamlEntry.localization_prefix?('en.date.order[1]'         ).should be true
-      TranslationIO::YamlEntry.localization_prefix?('en.date.order[2]'         ).should be true
-      TranslationIO::YamlEntry.localization_prefix?('en.date.orders[2]'        ).should be false
+      TranslationIO::YamlEntry.localization_prefix?('en.date.order[0]').should be true
+      TranslationIO::YamlEntry.localization_prefix?('en.date.order[1]').should be true
+      TranslationIO::YamlEntry.localization_prefix?('en.date.order[2]').should be true
+      TranslationIO::YamlEntry.localization_prefix?('en.date.orders[2]').should be false
 
-      TranslationIO::YamlEntry.localization_prefix?('en.yo'                                       ).should be false
+      TranslationIO::YamlEntry.localization_prefix?('en.yo').should be false
       TranslationIO::YamlEntry.localization_prefix?('en.number.human.decimal_units.units.thousand').should be false
     end
   end
