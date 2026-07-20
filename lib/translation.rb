@@ -33,12 +33,15 @@ module TranslationIO
 
       if !@config.disable_gettext
         require_gettext_dependencies
-        add_missing_locales
         add_parser_for_erb_source_formats(@config.erb_source_formats)
 
         if Rails.env.development?
           GetText::TextDomainManager.cached = false
         end
+
+        # Set default GetText locale (last fallback) as config.source_locale instead of "en" (default)
+        gettext_locale = @config.source_locale.to_s.gsub('-', '_').to_sym
+        Locale.set_default(gettext_locale)
 
         # include is private until Ruby 2.1
         Proxy.send(:include, GetText)
@@ -69,19 +72,20 @@ module TranslationIO
       require 'gettext/tools'
       require 'gettext/text_domain_manager'
       require 'gettext/tools/xgettext'
-    end
-
-    # Missing languages from Locale that are in Translation.io
-    def add_missing_locales
-      Locale::Info.three_languages['wee'] = Locale::Info::Language.new('', 'wee', 'I', 'L', 'Lower Sorbian')
-      Locale::Info.three_languages['wen'] = Locale::Info::Language.new('', 'wen', 'I', 'L', 'Upper Sorbian')
+      require "gettext/tools/parser/erubi" if Gem::Version.new(GetText::VERSION) >= Gem::Version.new('3.4.3')
     end
 
     def add_parser_for_erb_source_formats(new_erb_formats)
-      existing_extensions = GetText::ErbParser.instance_variable_get("@config")[:extnames]
       new_extensions = new_erb_formats.collect { |ext| ".#{ext}" }
 
+      existing_extensions = GetText::ErbParser.instance_variable_get("@config")[:extnames]
       GetText::ErbParser.instance_variable_get("@config")[:extnames] = (existing_extensions + new_extensions).uniq
+
+      # for gettext >= 3.4.3 (erubi compatibility)
+      if defined?(GetText::ErubiParser)
+        existing_extensions = GetText::ErubiParser.instance_variable_get("@config")[:extnames]
+        GetText::ErubiParser.instance_variable_get("@config")[:extnames] = (existing_extensions + new_extensions).uniq
+      end
     end
 
     def info(message, level = 0, verbose_level = 0)
@@ -94,6 +98,15 @@ module TranslationIO
 
     def normalize_path(relative_or_absolute_path)
       File.expand_path(relative_or_absolute_path).gsub("#{Dir.pwd}/", '')
+    end
+
+    # Cf. https://github.com/translation/rails/issues/47
+    def yaml_load(source)
+      begin
+        YAML.load(source, :aliases => true) || {}
+      rescue ArgumentError
+        YAML.load(source) || {}
+      end
     end
 
     def version
